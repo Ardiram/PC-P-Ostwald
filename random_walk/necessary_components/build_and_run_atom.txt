@@ -1,0 +1,104 @@
+#!/bin/bash
+
+# Strict error handling
+set -euo pipefail
+
+# Debug function
+debug() {
+    echo "[DEBUG] $*" >&2
+}
+
+# Extract temperature value
+extract_temperature() {
+    local temp=$(grep '^# define TEMPERATURE' ein_atom_random_walk.c | awk '{print $4}')
+    if [[ -z "$temp" ]]; then
+        echo "Error: Could not extract temperature from C file" >&2
+        exit 1
+    fi
+    echo "$temp"
+}
+
+# Process single temperature
+process_temperature() {
+    local initial_temp="$1"
+    local inc="$2"
+    local current_temp=$((initial_temp + inc))
+    local folder="/output/${current_temp}K"
+    local executable="ein_atom_${current_temp}"
+
+    debug "Processing temperature: $current_temp"
+
+    # Create output directories
+    mkdir -p "$folder"
+    for j in $(seq 1 5); do
+        mkdir -p "$folder/run_$j"
+    done
+
+    # Create a copy of source file for this temperature
+    cp ein_atom_random_walk.c "$folder/ein_atom_random_walk.c"
+    
+    # Update temperature in source file
+    sed -i "s/^# define TEMPERATURE [0-9]\+/# define TEMPERATURE $current_temp/" "$folder/ein_atom_random_walk.c"
+    
+    # Compile
+    if ! gcc-14 -fsanitize=address -g -o "$folder/$executable" "$folder/ein_atom_random_walk.c" -lm; then
+        echo "Compilation failed for temperature $current_temp" >&2
+        return 1
+    fi
+
+    # Sequential processing for each run directory with 1-second delay
+    for j in $(seq 1 5); do 
+        run_dir="$folder/run_$j"
+        cp "$folder/$executable" "$run_dir/$executable"
+        
+        debug "Preparing run $j for temperature $current_temp"
+        
+        # Consistent 1-second delay between runs
+        sleep 1
+        
+        debug "Running simulation in $run_dir for temperature $current_temp"
+        (
+            cd "$run_dir"
+            ./"$executable" || echo "Execution failed in $run_dir" >&2
+            # Remove executable after run
+            rm -f "$executable"
+        )
+    done
+
+    # Remove main executable and source file
+    rm -f "$folder/$executable" "$folder/ein_atom_random_walk.c"
+}
+
+# Main script
+main() {
+    # Ensure /output directory exists
+    mkdir -p /output
+
+    # Extract initial temperature
+    local temp=$(extract_temperature)
+    debug "Initial temperature: $temp"
+
+    # Split temperatures string into array
+    IFS=',' read -ra TEMPERATURE_INCREMENTS <<< "$TEMPERATURES"
+    
+    debug "Temperature increments: ${TEMPERATURE_INCREMENTS[@]}"
+
+    # Process each temperature increment sequentially
+    for inc in "${TEMPERATURE_INCREMENTS[@]}"; do
+        process_temperature "$temp" "$inc"
+    done
+
+    # Post-processing for circle.py
+    if [[ -f circle.py ]]; then
+        cp circle.py /output/
+        cd /output/
+        python3 circle.py
+        # Remove circle.py after execution
+        rm -f circle.py
+    else
+        echo "Warning: circle.py not found" >&2
+    fi
+}
+
+# Execute main script
+main

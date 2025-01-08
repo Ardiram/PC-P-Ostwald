@@ -1,0 +1,86 @@
+# Stage 1: Build C Code
+FROM gcc:latest AS c-builder
+
+LABEL stage="c-builder"
+
+# Set the working directory
+WORKDIR /build
+
+# Copy the C source code
+COPY ostwald.c ./
+
+# Compile the C code with optimizations
+RUN gcc -O3 -o ostwald ostwald.c -lm
+
+
+# Stage 2: Build Rust Code
+FROM rust:latest AS rust-builder
+
+LABEL stage="rust-builder"
+
+# Install required dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    pkg-config \
+    libglib2.0-dev \
+    libgettextpo-dev \
+    libgdk-pixbuf-2.0-dev \
+    gettext-base \
+    python3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
+WORKDIR /rust-project
+
+# Copy Rust project files
+COPY necessary_components/Cargo.toml ./
+COPY necessary_components/src ./src
+
+# Build Rust project in release mode
+RUN cargo build --release --verbose
+
+
+# Stage 3: Final Runtime Image
+FROM ubuntu:latest AS runtime
+
+LABEL Author="Noel Marks" 
+LABEL Contact="noel.marks@stud.uni-due.de" 
+LABEL "Last Modified"="24. Dec 2024"
+
+# Install runtime dependencies
+RUN apt-get update && \
+    apt-get install -y libfontconfig1 libgtk-4-1 ffmpeg libpng16-16 python3 python3-pip python3-virtualenv && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Set up runtime directories
+WORKDIR /DockerWorld/
+ENV OUTPUT_DIR=/output
+RUN mkdir -p "$OUTPUT_DIR"
+
+# Copy the C binary
+COPY --from=c-builder /build/ostwald ./
+
+# Copy the Rust binary
+COPY --from=rust-builder /rust-project/target/release/rust-svg-to-video ./rust-binary
+
+# Copy the runtime execution script
+COPY necessary_components/build_and_run_ostwald.txt necessary_components/analyse_label_behavior.py necessary_components/requirements.txt ./
+
+# Create the virtual environment using virtualenv
+RUN virtualenv venv && \
+    ./venv/bin/pip install --upgrade pip && \
+    ./venv/bin/pip install -r requirements.txt && \
+    rm requirements.txt
+
+# Make the execution script executable
+RUN mv build_and_run_ostwald.txt build_and_run_ostwald.sh && \
+    chmod +x build_and_run_ostwald.sh
+
+# Expose output directory as volume
+VOLUME ["$OUTPUT_DIR"]
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD pgrep -f "bash.*build_and_run_ostwald.sh" || exit 1
+
+# Define entrypoint
+ENTRYPOINT ["bash", "-c", "./build_and_run_ostwald.sh"]

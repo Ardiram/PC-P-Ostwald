@@ -1,0 +1,79 @@
+#!/bin/bash
+
+set -euo pipefail
+
+WORKDIR="/DockerWorld/"
+OUTPUT_DIR="/output"
+VENV_DIR="./venv"
+TEMP_SVG_DIR="$OUTPUT_DIR/temp_svgs"
+PNG_DIR="png_for_video"
+
+trap 'rm -rf "$TEMP_SVG_DIR"' EXIT
+
+# Block 1: Run C binary (ostwald)
+{
+    echo "Running C binary (ostwald)..."
+    mkdir -p "$OUTPUT_DIR" || { echo "Failed to create $OUTPUT_DIR"; exit 1; }
+    [ -f ostwald ] || { echo "ostwald binary not found"; exit 1; }
+    
+    # Copy binary to output directory and run it
+    cp -v ostwald "$OUTPUT_DIR/"
+    cd "$OUTPUT_DIR"
+
+    time ./ostwald || { echo "Execution of ostwald failed"; exit 1; }
+
+    echo "C binary (ostwald) completed successfully."
+
+    # Clean up binary from the output directory
+    rm ostwald
+}
+
+
+# Block 2: Run Python script in virtual environment
+{
+    echo "Running Python script..."
+    cd "$WORKDIR"
+    [ -d "$VENV_DIR" ] || { echo "Python virtual environment not found"; exit 1; }
+    source "$VENV_DIR/bin/activate" || { echo "Failed to activate Python virtual environment"; exit 1; }
+
+    # Copy Python script to the output directory and run it
+    [ -f "analyse_label_behavior.py" ] || { echo "Python script not found"; exit 1; }
+    cp -v "analyse_label_behavior.py" "$OUTPUT_DIR/"
+    cd "$OUTPUT_DIR"
+    
+    time python analyse_label_behavior.py || { echo "Python script failed"; exit 1; }
+
+    # Clean up Python script from the output directory
+    rm analyse_label_behavior.py
+    deactivate
+}
+
+# Block 3: Run Rust binary
+{
+    echo "Running Rust binary..."
+    [ -d "$TEMP_SVG_DIR" ] || { echo "Temporary Svg Folder not found"; exit 1; }
+    cd "$WORKDIR"
+    [ -f rust-binary ] || { echo "Rust binary not found in $WORKDIR"; exit 1; }
+
+    # Copy the binary to the temporary directory
+    cp -v rust-binary "$TEMP_SVG_DIR/"
+    cd "$TEMP_SVG_DIR"
+
+    # Run the Rust binary
+    time ./rust-binary . || { echo "Rust binary execution failed"; exit 1; }
+
+    # Move the generated video to the output directory
+    if [ -f "$PNG_DIR/video.mp4" ]; then
+        cd "$PNG_DIR"
+        mv "video.mp4" "$OUTPUT_DIR/timelaps_ostwald_ripening.mp4"
+        echo "Rust binary successfully created the video."
+    else
+        echo "Generated video not found after Rust binary execution."
+        exit 1
+    fi
+
+    # Clean up temporary directory
+    cd "$WORKDIR"
+    rm -rf "$TEMP_SVG_DIR"
+}
+
