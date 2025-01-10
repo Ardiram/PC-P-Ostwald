@@ -1,7 +1,3 @@
----
-marp: false
----
-
 # Docker: A Comprehensive Overview
 
 ## What is Docker?
@@ -56,12 +52,12 @@ Think of a container as the **live, running version of an image**.
 
 ## Key Differences Between Images and Containers
 
-| Feature          | Docker Image                           | Docker Container                          |
-|-------------------|----------------------------------------|-------------------------------------------|
-| **State**        | Static, immutable                      | Dynamic, running or stopped               |
-| **Purpose**      | Blueprint/template for containers      | Execution environment for applications    |
-| **Lifespan**     | Permanent until deleted                | Temporary but can be restarted            |
-| **Modifiability**| Read-only                              | Can be modified during runtime            |
+| Feature           | Docker Image                      | Docker Container                       |
+| ----------------- | --------------------------------- | -------------------------------------- |
+| **State**         | Static, immutable                 | Dynamic, running or stopped            |
+| **Purpose**       | Blueprint/template for containers | Execution environment for applications |
+| **Lifespan**      | Permanent until deleted           | Temporary but can be restarted         |
+| **Modifiability** | Read-only                         | Can be modified during runtime         |
 
 ---
 
@@ -130,10 +126,11 @@ For more information about Docker, see the [Docker documentation](https://docs.d
 ### Step 1: Install Docker
 
 1. **Download Docker Desktop**
+
    - For **Mac**: [Download Docker Desktop for Mac](https://docs.docker.com/desktop/install/mac-install/).
    - For **Linux**: [Download Docker Desktop for Linux](https://docs.docker.com/desktop/install/linux-install/).
-   - For **Windows**: [Download Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/). 
-   ***[Here you can watch a Guide for installing Docker on Windows](https://www.youtube.com/watch?v=bw-bMhlhcpg)***
+   - For **Windows**: [Download Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/).
+     **_[Here you can watch a Guide for installing Docker on Windows](https://www.youtube.com/watch?v=bw-bMhlhcpg)_**
 
 2. **Follow the Installation Instructions**
 
@@ -160,6 +157,7 @@ Once Docker is installed, navigate to the directory where your dockerfile is loc
    docker build -t myprogram .
    docker run --rm -v $(pwd)/output:/output myprogram
    ```
+
 ##### For Windows Users
 
 1. Open **PowerShell** (or Command Prompt) and navigate to either the `ostwald` or `random_walk` folder.
@@ -167,6 +165,7 @@ Once Docker is installed, navigate to the directory where your dockerfile is loc
 2. Use the following commands:
 
    - **PowerShell**:
+
      ```powershell
      docker build -t myprogram .
      docker run --rm -v ${PWD}/output:/output myprogram
@@ -180,7 +179,7 @@ Once Docker is installed, navigate to the directory where your dockerfile is loc
 
    > **Note**: Ensure Docker Desktop is running before executing these commands on Windows.
 
-   ***Here is an instruction video showing how to run the ostwald simulation.*** (You can also find the video by clinking [this link](./media/running_ostwald_simulation.mp4))
+   **_Here is an instruction video showing how to run the ostwald simulation._** (You can also find the video by clinking [this link](./media/running_ostwald_simulation.mp4))
 
    <video controls src="media/running_ostwald_simulation.mp4" title="Running Ostwald Simulation"></video>
 
@@ -209,32 +208,32 @@ In the terminal (or command-line interface), the basic navigation commands are t
    cd ostwald
    ```
 
-    To move back to the previous directory:
+   To move back to the previous directory:
 
    ```bash
     cd ..
    ```
 
 2. **Listing Files**:
-    To view the files in the current directory, use the ls command:
+   To view the files in the current directory, use the ls command:
 
    ```bash
     ls
-    ```
+   ```
 
 3. **Current Directory**:
-    To display the path of the current directory, use the pwd (print working directory) command:
+   To display the path of the current directory, use the pwd (print working directory) command:
 
    ```bash
     pwd
-    ```
+   ```
 
-3. **Navigating to a Specific Directory**:
-    If you want to jump to a specific directory, provide the full path or relative path from your current location:
+4. **Navigating to a Specific Directory**:
+   If you want to jump to a specific directory, provide the full path or relative path from your current location:
 
-    ```bash
-    cd /path/to/Docker/ostwald
-    ```
+   ```bash
+   cd /path/to/Docker/ostwald
+   ```
 
 ### For Windows Users
 
@@ -247,39 +246,39 @@ Windows users can navigate in **PowerShell** or **Command Prompt**. Here are som
    cd ostwald
    ```
 
-    To move back to the previous directory:
+   To move back to the previous directory:
 
    ```powershell
     cd ..
    ```
 
-1. **Listing Files:** 
+1. **Listing Files:**
    In **PowerShell**, use ls or dir to list files:
 
    ```powershell
     ls
    ```
 
-    In **Command Prompt**, use dir:
+   In **Command Prompt**, use dir:
 
    ```c,d
     dir
    ```
 
-3. **Current Directory:**
-    In **PowerShell**, use pwd (like in Mac/Linux) to show the current directory:
+1. **Current Directory:**
+   In **PowerShell**, use pwd (like in Mac/Linux) to show the current directory:
 
    ```powershell
     pwd
    ```
 
-    In **Command Prompt**, use cd to display the current directory:
+   In **Command Prompt**, use cd to display the current directory:
 
    ```cmd
     cd
    ```
 
-4. **Navigating to a Specific Directory:**
+1. **Navigating to a Specific Directory:**
    In **PowerShell** and **Command Prompt**, use the full or relative path to navigate to a specific directory:
 
    ```powershell
