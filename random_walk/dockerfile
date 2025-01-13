@@ -4,7 +4,7 @@ FROM ubuntu:latest
 # This Metadata for the resulting Docker-image 
 LABEL Author="Noel Marks" 
 LABEL Contact="noel.marks@stud.uni-due.de" 
-LABEL "Last Modified"="24. Dec 2024"
+LABEL "Last Modified"="13. Jan 2025"
 
 # Install gcc-14 and dependencies
 RUN apt-get update && \
@@ -24,6 +24,9 @@ COPY ein_atom_random_walk.c necessary_components/build_and_run_atom.txt necessar
 # Prepare the script
 RUN mv build_and_run_atom.txt build_and_run_atom.sh && \
     chmod +x build_and_run_atom.sh
+
+# Skip the Python script for now
+RUN sed -i '91,100s/^/#/' build_and_run_atom.sh
 
 # Create output directory
 RUN mkdir -p /output
