@@ -110,13 +110,9 @@ CMD ["python", "app.py"]
 
 # Running Docker Scripts in the `ostwald` and `random_walk` Subdirectories
 
+This experiment is based on the paper: "[Teaching the Growth, Ripening, and Agglomeration of Nanostructures in Computer Experiments](https://pubs.acs.org/doi/10.1021/acs.jchemed.6b01008)" von D. Diesing und J. Meyburg.
+
 This guide will walk you through setting up Docker on your system, navigating the `ostwald` and `random_walk` subdirectories, and running Docker scripts to output files into specific folders.
-
-## Introduction to Docker
-
-Docker is a platform designed to simplify building, deploying, and managing applications within containers. Containers package an application along with its dependencies, making it easy to run consistently across different environments. With Docker, you can ensure that your applications run reliably on any system that supports Docker, without worrying about software conflicts.
-
-For more information about Docker, see the [Docker documentation](https://docs.docker.com/get-started/).
 
 ## Prerequisites
 
