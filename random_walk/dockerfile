@@ -25,7 +25,7 @@ COPY ein_atom_random_walk.c necessary_components/build_and_run_atom.txt necessar
 RUN mv build_and_run_atom.txt build_and_run_atom.sh && \
     chmod +x build_and_run_atom.sh
 
-# Skip the Python script for now
+# Modify the Bash script
 RUN sed -i '91,100s/^/#/' build_and_run_atom.sh
 
 # Create output directory
