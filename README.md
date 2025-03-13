@@ -151,7 +151,7 @@ Once Docker is installed, navigate to the directory where your dockerfile is loc
 
    ```zsh
    docker build -t myprogram .
-   docker run --rm -v $(pwd)/output:/output myprogram
+   docker run --rm -v -d $(pwd)/output:/output myprogram
    ```
 
 ##### For Windows Users
@@ -164,13 +164,13 @@ Once Docker is installed, navigate to the directory where your dockerfile is loc
 
      ```powershell
      docker build -t myprogram .
-     docker run --rm -v ${PWD}/output:/output myprogram
+     docker run --rm -v -d ${PWD}/output:/output myprogram
      ```
 
    - **Command Prompt**:
      ```cmd
      docker build -t myprogram .
-     docker run --rm -v %cd%/output:/output myprogram
+     docker run --rm -v -d %cd%/output:/output myprogram
      ```
 
    > **Note**: Ensure Docker Desktop is running before executing these commands on Windows.
@@ -187,7 +187,7 @@ Once Docker is installed, navigate to the directory where your dockerfile is loc
 #### Explanation of Commands
 
 - `docker build -t myprogram .`: Builds a Docker image named `myprogram` from the Dockerfile in the current directory.
-- `docker run --rm -v $(pwd)/output:/output myprogram`: Runs the `myprogram` container, mounts the local `output` directory into the container’s `/output` directory, and automatically removes the container after it exits.
+- `docker run --rm -v -d $(pwd)/output:/output myprogram`: Runs the `myprogram` container, mounts the local `output` directory into the container’s `/output` directory, and automatically removes the container after it exits.
 
 > **Note for Windows PowerShell users**: `${PWD}` is used to represent the current directory, similar to `$(pwd)` in Linux/Mac. For Windows Command Prompt users, `%cd%` can be used as an alternative.
 
