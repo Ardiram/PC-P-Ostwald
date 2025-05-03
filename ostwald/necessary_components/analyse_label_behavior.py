@@ -378,6 +378,7 @@ def process_svg_files(input_folder, output_csv, layer_id, target_label):
 def plot_label_frequencies(data, output_svg="label_frequencies.svg"):
     """
     Plots label frequencies with optimized spacing.
+    If there are no labels at all, writes an empty plot and returns.
     """
     all_labels = []
     for entry in data:
@@ -387,27 +388,41 @@ def plot_label_frequencies(data, output_svg="label_frequencies.svg"):
 
     label_counts = Counter(all_labels)
     sorted_labels = sorted(label_counts.keys(), key=lambda x: int(x))
-    sorted_frequencies = [label_counts[label] for label in sorted_labels]
     
+    # Fallback if no labels
+    if not sorted_labels:
+        # create a blank figure with a message
+        plt.figure(figsize=(6, 4))
+        plt.text(0.5, 0.5, "Keine Nachbar-Labels gefunden",
+                 ha='center', va='center', fontsize=12, style='italic')
+        plt.axis('off')
+        plt.savefig(output_svg, format="svg", bbox_inches='tight')
+        plt.close()
+        return
+
+    sorted_frequencies = [label_counts[label] for label in sorted_labels]
     num_labels = len(sorted_labels)
+
+    # adjust figure size
     width = max(16, min(num_labels * 0.4, 40))
     height = 10
     plt.figure(figsize=(width, height))
-    
+
+    # safe font size
     font_size = max(6, min(12, 300 / num_labels))
-    
+
     plt.bar(range(num_labels), sorted_frequencies, color="blue")
     plt.xticks(range(num_labels), sorted_labels, rotation=45, fontsize=font_size)
     plt.grid(axis='y', linestyle='--', alpha=0.3)
-    
+
     plt.xlabel("Nachbar-Label", fontsize=12, fontweight="bold")
     plt.ylabel("Häufigkeit über alle Dateien", fontsize=12, fontweight="bold")
     plt.title("Häufigkeit der Nachbar Label", fontsize=14, fontweight="bold", fontstyle="italic")
-    
+
     # Remove excess spacing
-    plt.margins(x=0.001)  # Minimal margin
+    plt.margins(x=0.001)
     plt.tight_layout(pad=.001)
-    
+
     plt.savefig(output_svg, format="svg", bbox_inches='tight')
     plt.close()
 

@@ -7,6 +7,9 @@ use quick_xml::events::{Event, BytesStart};
 use std::process::Command;
 use std::fs::File;
 use std::io::Write;
+use std::ffi::OsStr;
+use glob::glob;
+use std::path::PathBuf;
 
 // Load the svg files in sorted order for further processing
 pub fn load_sorted_svgs(input_dir: &str) -> Result<Vec<std::fs::DirEntry>, Box<dyn std::error::Error>> {
@@ -135,6 +138,55 @@ pub fn svg_to_png(input_path: &Path, output_path: &Path) -> Result<(), Box<dyn s
     pixbuf.savev(output_path, "png", &[])?;
 
     Ok(())
+}
+
+/// Simply counts how many files match prefix###extension (after filling).
+pub fn count_existing_frames(
+    dir: &Path,
+    extension: &str,
+) -> usize {
+    fs::read_dir(dir)
+        .unwrap()
+        .filter_map(Result::ok)
+        .filter(|e| {
+            let p = e.path();
+            p.extension() == Some(OsStr::new(&extension[1..]))
+        })
+        .count()
+}
+
+
+pub fn fill_missing_frames(
+    dir: &Path,
+    prefix: &str,
+    digits: usize,
+) -> Result<usize, Box<dyn std::error::Error>> {
+    // 1. Glob all matching files (e.g. "./png_for_video/m*.png")
+    let pattern = format!("{}/{}*.png", dir.display(), prefix);
+    let mut paths: Vec<PathBuf> = glob(&pattern)?
+        .filter_map(Result::ok)
+        .collect();
+
+    // 2. Sort by the numeric part of the stem
+    paths.sort_by_key(|p| {
+        p.file_stem()
+         .and_then(|s| s.to_str())
+         .and_then(|stem| stem.strip_prefix(prefix))
+         .and_then(|num| num.parse::<usize>().ok())
+         .unwrap_or(0)
+    });
+
+    // 3. Rename each in sequence: m001.png, m002.png, …
+    for (i, old_path) in paths.iter().enumerate() {
+        let new_name = format!("{prefix}{:0width$}.png", i + 1, width = digits);
+        let new_path = dir.join(new_name);
+        if old_path != &new_path {
+            fs::rename(old_path, &new_path)?;
+        }
+    }
+
+    // 4. Return total count
+    Ok(paths.len())
 }
 
 /// Generate a video chunk from PNGs within the specified time range.
