@@ -94,7 +94,7 @@ static uint64_t s[2] = {1234567890987654321ULL, 9876543210123456789ULL};
 
 # define TEMPERATURE_DURING_GROWTH  50  // all temperatures in Kelvin
 
-# define TEMPERATURE_DURING_RIPENING  210
+# define TEMPERATURE_DURING_RIPENING  100
 
 # define DURATION_OF_HEATING_PROCESS 10     //  time in seconds needed to heat the sample from TEMPERATURE_DURING_GROWTH to TEMPERATURE_DURING_RIPENING
 // for the set default values this corresponds to a heating rate of 12 Kelvin per second. This is achievable with modern laboratory equipment.

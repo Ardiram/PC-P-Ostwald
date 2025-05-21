@@ -4,6 +4,7 @@ set -euo pipefail
 
 WORKDIR="/DockerWorld/"
 OUTPUT_DIR="/output"
+VENV_DIR="./venv"
 TEMP_SVG_DIR="$OUTPUT_DIR/temp_svgs"
 PNG_DIR="png_for_video"
 
@@ -32,16 +33,18 @@ trap 'rm -rf "$TEMP_SVG_DIR"' EXIT
 {
     echo "Running Python script..."
     cd "$WORKDIR"
+    [ -d "$VENV_DIR" ] || { echo "Python virtual environment not found"; exit 1; }
+    source "$VENV_DIR/bin/activate" || { echo "Failed to activate Python virtual environment"; exit 1; }
 
     # Copy Python script to the output directory and run it
     [ -f "analyse_label_behavior.py" ] || { echo "Python script not found"; exit 1; }
     cp -v "analyse_label_behavior.py" "$OUTPUT_DIR/"
     cd "$OUTPUT_DIR"
-    
     time python analyse_label_behavior.py || { echo "Python script failed"; exit 1; }
 
     # Clean up Python script from the output directory
     rm analyse_label_behavior.py
+    deactivate
 }
 
 # Block 3: Run Rust binary
