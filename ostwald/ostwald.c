@@ -19,10 +19,10 @@ static uint64_t s[2] = {1234567890987654321ULL, 9876543210123456789ULL};
 
 // Parameters easily adjustable by the user concerning the surface size
 
-# define NUMBER_OF_COLUMNS 250  // surface size in j (horizontal) direction, the default value taken in the Journal of Chemical Education article is 250
+# define NUMBER_OF_COLUMNS 50  // surface size in j (horizontal) direction, the default value taken in the Journal of Chemical Education article is 250
 // value must be larger than 10
 
-# define NUMBER_OF_ROWS  250    // surface size in i (vertical) direction , the default value taken in the Journal of Chemical Education article is 250
+# define NUMBER_OF_ROWS  50    // surface size in i (vertical) direction , the default value taken in the Journal of Chemical Education article is 250
 // value must be larger than 10
 
 
@@ -92,7 +92,7 @@ static uint64_t s[2] = {1234567890987654321ULL, 9876543210123456789ULL};
 
 # define FINAL_COVERAGE 0.01   // this one was changed september 2023 from 0.02
 
-# define TEMPERATURE_DURING_GROWTH  60  // all temperatures in Kelvin
+# define TEMPERATURE_DURING_GROWTH  50  // all temperatures in Kelvin
 
 # define TEMPERATURE_DURING_RIPENING  210
 

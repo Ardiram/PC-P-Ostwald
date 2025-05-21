@@ -38,7 +38,7 @@ trap 'rm -rf "$TEMP_SVG_DIR"' EXIT
     cp -v "analyse_label_behavior.py" "$OUTPUT_DIR/"
     cd "$OUTPUT_DIR"
     
-    time uv run --isolated --no-project --with-requirements "$WORKDIR"requirements.txt python analyse_label_behavior.py || { echo "Python script failed"; exit 1; }
+    time python analyse_label_behavior.py || { echo "Python script failed"; exit 1; }
 
     # Clean up Python script from the output directory
     rm analyse_label_behavior.py
