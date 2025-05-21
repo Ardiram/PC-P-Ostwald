@@ -2,7 +2,6 @@ import os
 import csv
 import xml.etree.ElementTree as ET
 import math
-import matplotlib.pyplot as plt
 from collections import Counter
 import time
 from rich import print
@@ -375,56 +374,39 @@ def process_svg_files(input_folder, output_csv, layer_id, target_label):
 
 
 @log_execution
-def plot_label_frequencies(data, output_svg="label_frequencies.svg"):
+def save_label_frequencies(data, output_svg="label_frequencies.svg"):
     """
-    Plots label frequencies with optimized spacing.
-    If there are no labels at all, writes an empty plot and returns.
+    Computes label frequencies and writes them as CSV.
+    The CSV will have two columns: 'label number' and 'count',
+    and will be saved alongside the SVG but with a .csv extension.
+    If there are no labels at all, it writes only the header row.
     """
+    # 1) Gather all labels
     all_labels = []
     for entry in data:
         neighbors = entry[3]
         if neighbors:
             all_labels.extend(neighbors.split(" | "))
 
+    # 2) Count and sort
     label_counts = Counter(all_labels)
     sorted_labels = sorted(label_counts.keys(), key=lambda x: int(x))
-    
-    # Fallback if no labels
-    if not sorted_labels:
-        # create a blank figure with a message
-        plt.figure(figsize=(6, 4))
-        plt.text(0.5, 0.5, "Keine Nachbar-Labels gefunden",
-                 ha='center', va='center', fontsize=12, style='italic')
-        plt.axis('off')
-        plt.savefig(output_svg, format="svg", bbox_inches='tight')
-        plt.close()
-        return
 
-    sorted_frequencies = [label_counts[label] for label in sorted_labels]
-    num_labels = len(sorted_labels)
+    # 3) Determine CSV path
+    base, _ = os.path.splitext(output_svg)
+    output_csv = f"{base}.csv"
 
-    # adjust figure size
-    width = max(16, min(num_labels * 0.4, 40))
-    height = 10
-    plt.figure(figsize=(width, height))
+    # 4) Write CSV
+    with open(output_csv, mode="w", newline="", encoding="utf-8") as csvfile:
+        writer = csv.writer(csvfile)
+        # header
+        writer.writerow(["label number", "count"])
+        # if no labels, this is all we write
+        if not sorted_labels:
+            return
 
-    # safe font size
-    font_size = max(6, min(12, 300 / num_labels))
-
-    plt.bar(range(num_labels), sorted_frequencies, color="blue")
-    plt.xticks(range(num_labels), sorted_labels, rotation=45, fontsize=font_size)
-    plt.grid(axis='y', linestyle='--', alpha=0.3)
-
-    plt.xlabel("Nachbar-Label", fontsize=12, fontweight="bold")
-    plt.ylabel("Häufigkeit über alle Dateien", fontsize=12, fontweight="bold")
-    plt.title("Häufigkeit der Nachbar Label", fontsize=14, fontweight="bold", fontstyle="italic")
-
-    # Remove excess spacing
-    plt.margins(x=0.001)
-    plt.tight_layout(pad=.001)
-
-    plt.savefig(output_svg, format="svg", bbox_inches='tight')
-    plt.close()
+        for label in sorted_labels:
+            writer.writerow([label, label_counts[label]])
 
 
 @with_parsed_svg
@@ -884,7 +866,7 @@ if __name__ == "__main__":
     data = process_svg_files(
         input_folder, output_csv, layer_of_interest, str(label_of_interest)
     )
-    plot_label_frequencies(data)
+    save_label_frequencies(data)
     label_overlaps = process_overlaps(data, input_folder, layer_of_interest)
     created_directory = copy_svgs_to_temp(input_folder)
     add_previous_positions_to_all_svgs(data, created_directory, layer_of_interest)
