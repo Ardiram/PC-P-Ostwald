@@ -19,13 +19,16 @@ static uint64_t s[2] = {1234567890987654321ULL, 9876543210123456789ULL};
 
 // Parameters easily adjustable by the user concerning the surface size
 
-# define NUMBER_OF_COLUMNS 50  // surface size in j (horizontal) direction, the default value taken in the Journal of Chemical Education article is 250
+# define NUMBER_OF_COLUMNS 200  // surface size in j (horizontal) direction, the default value taken in the Journal of Chemical Education article is 250
 // value must be larger than 10
 
-# define NUMBER_OF_ROWS  50    // surface size in i (vertical) direction , the default value taken in the Journal of Chemical Education article is 250
+# define NUMBER_OF_ROWS  200    // surface size in i (vertical) direction , the default value taken in the Journal of Chemical Education article is 250
 // value must be larger than 10
 
 
+# define TEMPERATURE_DURING_GROWTH  90  // all temperatures in Kelvin
+
+# define TEMPERATURE_DURING_RIPENING  210
 //  Remark: The eps output files of the adsorbate structure are not optimized for NUMBER_OF_COLUMNS not equal to  NUMBER_OF_ROWS but you can play with it.
 
 # define UPPER_LIMIT_FOR_SUBSTRATE_DISPLAY  90 // this is to limit the size of the eps output files
@@ -91,10 +94,6 @@ static uint64_t s[2] = {1234567890987654321ULL, 9876543210123456789ULL};
 # define DEPOSITION_RATE  5e-3   //  in monolayers per second
 
 # define FINAL_COVERAGE 0.01   // this one was changed september 2023 from 0.02
-
-# define TEMPERATURE_DURING_GROWTH  50  // all temperatures in Kelvin
-
-# define TEMPERATURE_DURING_RIPENING  100
 
 # define DURATION_OF_HEATING_PROCESS 10     //  time in seconds needed to heat the sample from TEMPERATURE_DURING_GROWTH to TEMPERATURE_DURING_RIPENING
 // for the set default values this corresponds to a heating rate of 12 Kelvin per second. This is achievable with modern laboratory equipment.

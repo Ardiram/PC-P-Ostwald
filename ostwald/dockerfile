@@ -41,7 +41,7 @@ RUN cargo build --release --verbose
 
 
 # Stage 3: Final Runtime Image
-FROM ubuntu:latest AS runtime
+FROM ubuntu:22.04 AS runtime
 
 LABEL Author="Noel Marks" 
 LABEL Contact="noel.marks@stud.uni-due.de" 
